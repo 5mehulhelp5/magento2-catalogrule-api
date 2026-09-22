@@ -1,0 +1,22 @@
+#--------------------------#
+# IDE Project Files/Folder #
+#--------------------------#
+/nbproject/
+/.idea/
+
+#--------------------------#
+# XDebug Extension         #
+#--------------------------#
+remote_log
+
+#--------------------------#
+# Global Files Types       #
+#--------------------------#
+.svn*
+*.bkp
+*.old
+*.swm
+*.swn
+*.swp
+*.swo
+.DS_Store

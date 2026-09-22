@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<!--
+  ~ Copyright © 2026 Studio Raz. All rights reserved.
+  ~ See LICENSE.txt for license details.
+  -->
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Webapi:etc/webapi.xsd">
+    <!-- Catalog Rule CRUD -->
+    <route url="/V1/catalogRules/:ruleId" method="GET">
+        <service class="SR\CatalogRuleApi\Api\RuleRepositoryInterface" method="getById"/>
+        <resources>
+            <resource ref="Magento_CatalogRule::promo_catalog"/>
+        </resources>
+    </route>
+    <route url="/V1/catalogRules/search" method="GET">
+        <service class="SR\CatalogRuleApi\Api\RuleRepositoryInterface" method="getList"/>
+        <resources>
+            <resource ref="Magento_CatalogRule::promo_catalog"/>
+        </resources>
+    </route>
+    <route url="/V1/catalogRules" method="POST">
+        <service class="SR\CatalogRuleApi\Api\RuleRepositoryInterface" method="save"/>
+        <resources>
+            <resource ref="Magento_CatalogRule::promo_catalog"/>
+        </resources>
+    </route>
+    <route url="/V1/catalogRules/:ruleId" method="PUT">
+        <service class="SR\CatalogRuleApi\Api\RuleRepositoryInterface" method="save"/>
+        <resources>
+            <resource ref="Magento_CatalogRule::promo_catalog"/>
+        </resources>
+    </route>
+    <route url="/V1/catalogRules/:ruleId" method="DELETE">
+        <service class="SR\CatalogRuleApi\Api\RuleRepositoryInterface" method="deleteById"/>
+        <resources>
+            <resource ref="Magento_CatalogRule::promo_catalog"/>
+        </resources>
+    </route>
+
+    <!-- Catalog Rule Management -->
+    <route url="/V1/catalogRules/apply" method="POST">
+        <service class="SR\CatalogRuleApi\Api\RuleManagementInterface" method="applyAll"/>
+        <resources>
+            <resource ref="Magento_CatalogRule::promo_catalog"/>
+        </resources>
+    </route>
+</routes>
