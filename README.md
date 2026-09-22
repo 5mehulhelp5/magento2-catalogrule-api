@@ -21,6 +21,7 @@ and the core ORM model.
 - [Indexing behavior](#indexing-behavior)
 - [Architecture](#architecture)
 - [Tests](#tests)
+- [License](#license)
 
 ## Why a new module instead of routing the core repository
 
@@ -56,14 +57,14 @@ bin/magento module:status SR_CatalogRuleApi   # should print "enabled"
 
 ## Endpoints
 
-| Method | Path | Service |
-|---|---|---|
-| GET | `/V1/catalogRules/:ruleId` | `RuleRepositoryInterface::getById` |
-| GET | `/V1/catalogRules/search` | `RuleRepositoryInterface::getList` |
-| POST | `/V1/catalogRules` | `RuleRepositoryInterface::save` |
-| PUT | `/V1/catalogRules/:ruleId` | `RuleRepositoryInterface::save` |
-| DELETE | `/V1/catalogRules/:ruleId` | `RuleRepositoryInterface::deleteById` |
-| POST | `/V1/catalogRules/apply` | `RuleManagementInterface::applyAll` |
+| Method | Path | Service | Purpose |
+|---|---|---|---|
+| GET | `/V1/catalogRules/:ruleId` | `RuleRepositoryInterface::getById` | Fetch a single catalog price rule by its id |
+| GET | `/V1/catalogRules/search` | `RuleRepositoryInterface::getList` | Search/list rules using standard `SearchCriteriaInterface` filters, sorting, and paging |
+| POST | `/V1/catalogRules` | `RuleRepositoryInterface::save` | Create a new rule |
+| PUT | `/V1/catalogRules/:ruleId` | `RuleRepositoryInterface::save` | Update an existing rule, **replacing** its condition tree rather than merging into it |
+| DELETE | `/V1/catalogRules/:ruleId` | `RuleRepositoryInterface::deleteById` | Delete a rule by its id |
+| POST | `/V1/catalogRules/apply` | `RuleManagementInterface::applyAll` | Apply all active rules now — the REST equivalent of the admin "Apply Rules" button |
 
 `/search` and `/apply` are safe alongside `/:ruleId` — Magento's REST router matches exact paths before
 parameterized ones, the same way `/V1/salesRules/search` coexists with `/V1/salesRules/:ruleId`.
@@ -251,14 +252,18 @@ admin flag (`catalogrule_rules_dirty`) the admin Save/Delete controllers set; `a
 
 ## Architecture
 
+Module code lives under `src/` (the composer package root itself, so Magento's `ComponentRegistrar`
+resolves `src/` as the module directory — `composer.json`'s `autoload` maps the `SR\CatalogRuleApi\`
+namespace to `src/`):
+
 ```
-Api/RuleRepositoryInterface, Api/RuleManagementInterface      service contracts
-Api/Data/RuleInterface, Api/Data/RuleSearchResultInterface    DTO contracts
-Model/Data/Rule                                               DTO (AbstractExtensibleObject)
-Model/Converter/ToModel                                       DTO -> core Magento\CatalogRule\Model\Rule
-Model/Converter/ToDataModel                                   core Rule -> DTO
-Model/Data/Validator (+ RequiredFields, DateRange, ConditionType)  composite input validator
-Model/RuleRepository, Model/RuleManagement                    di.xml-bound implementations
+src/Api/RuleRepositoryInterface, src/Api/RuleManagementInterface      service contracts
+src/Api/Data/RuleInterface, src/Api/Data/RuleSearchResultInterface    DTO contracts
+src/Model/Data/Rule                                                   DTO (AbstractExtensibleObject)
+src/Model/Converter/ToModel                                           DTO -> core Magento\CatalogRule\Model\Rule
+src/Model/Converter/ToDataModel                                       core Rule -> DTO
+src/Model/Data/Validator (+ RequiredFields, DateRange, ConditionType)  composite input validator
+src/Model/RuleRepository, src/Model/RuleManagement                    di.xml-bound implementations
 ```
 
 - `ToModel` merges the DTO onto the loaded model, calls the core `Rule::validateData()`, and — when a
@@ -267,14 +272,18 @@ Model/RuleRepository, Model/RuleManagement                    di.xml-bound imple
 - `ToDataModel` reads the model back out (forcing `getWebsiteIds()`/`getCustomerGroupIds()` to lazy-load
   first) and converts the serialized condition column via `Rule::getRuleCondition()`.
 - `ConditionType` whitelists the condition class names accepted in `condition.type`, in addition to the
-  core `Magento\Rule\Model\ConditionFactory` guard; extend the whitelist via `etc/di.xml` if custom
+  core `Magento\Rule\Model\ConditionFactory` guard; extend the whitelist via `src/etc/di.xml` if custom
   condition types are added.
 
 ## Tests
 
-Unit tests live under `Test/Unit/`, mirroring Magento core's own testing conventions (PHPUnit,
+Unit tests live under `src/Test/Unit/`, mirroring Magento core's own testing conventions (PHPUnit,
 `Magento\Framework\TestFramework\Unit\Helper\ObjectManager`, `#[DataProvider]`):
 
 ```bash
-vendor/bin/phpunit -c dev/tests/unit/phpunit.xml.dist module/studioraz/magento2-catalogrule-api/Test/Unit
+vendor/bin/phpunit -c dev/tests/unit/phpunit.xml.dist module/studioraz/magento2-catalogrule-api/src/Test/Unit
 ```
+
+## License
+
+[MIT](LICENSE.txt) © Studio Raz
