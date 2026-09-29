@@ -6,9 +6,7 @@
     "license": "MIT",
     "require": {
         "php": "~8.1.0||~8.2.0||~8.3.0||~8.4.0",
-        "magento/framework": "*",
-        "mage-os/module-catalog-rule": "*",
-        "mage-os/module-webapi": "*"
+        "magento/framework": "*"
     },
     "autoload": {
         "files": [
